@@ -3,7 +3,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const fs = require('fs');
-
+const Joi= require("joi");
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
@@ -11,16 +11,23 @@ var app = express();
 
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded  ({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+const schema=Joi.object({
+    message: Joi.string().min(5).required,
+    author: Joi.string().required,
+    ts: Joi. required
+})
+
 
 module.exports = app;
 
 app.get("/chat/api/messages",(req,res)=>{
+
     fs.readFile('./api/messages.json', 'utf8', function readFileCallback(err, data){
         if (err){
             console.log(err);
@@ -52,7 +59,10 @@ app.get("/chat/api/messages/:msg",(req,res)=>{
 
 app.post("/chat/api/messages",(req,res)=>{
     console.log(req.body.message)
-    
+    const{error}=schema.validate(req.body)
+    if (error){
+        return res.status(400).send(error)
+    }
     fs.readFile('./api/messages.json', 'utf8', function readFileCallback(err, data){
         if (err){
             console.log(err);
@@ -77,7 +87,10 @@ app.post("/chat/api/messages",(req,res)=>{
 
 app.put("/chat/api/messages/:ts",(req,res)=>{
     const ts= parseInt(req.params.ts)
-
+    const{error}=schema.validate(req.body)
+    if (error){
+        return res.status(400).send(error)
+    }
 
     fs.readFile('./api/messages.json', 'utf8', function readFileCallback(err, data){
         let bol=false
@@ -109,7 +122,7 @@ app.put("/chat/api/messages/:ts",(req,res)=>{
 
         };
         if (bol===false){
-            res.status(400).send("No existe el ts")
+            res.status(404).send("No existe el ts")
         }
 
         }
@@ -122,7 +135,7 @@ app.put("/chat/api/messages/:ts",(req,res)=>{
 
 app.delete("/chat/api/messages/:ts",(req,res)=>{
     const ts= parseInt(req.params.ts)
-
+    
     let bol=false
     fs.readFile('./api/messages.json', 'utf8', function readFileCallback(err, data){
         if (err){
@@ -149,7 +162,7 @@ app.delete("/chat/api/messages/:ts",(req,res)=>{
 
         };
         if (bol===false){
-            res.status(400).send("no existe el ts")
+            res.status(404).send("no existe el ts")
         }
 
         }
