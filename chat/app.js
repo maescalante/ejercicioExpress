@@ -18,9 +18,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 const schema=Joi.object({
-    message: Joi.string().min(5).required,
-    author: Joi.string().required,
-    ts: Joi. required
+    message: Joi.string().min(5).required(),
+    author: Joi.string().required(),
+    ts: Joi. required()
 })
 
 
@@ -135,7 +135,7 @@ app.put("/chat/api/messages/:ts",(req,res)=>{
 
 app.delete("/chat/api/messages/:ts",(req,res)=>{
     const ts= parseInt(req.params.ts)
-    
+
     let bol=false
     fs.readFile('./api/messages.json', 'utf8', function readFileCallback(err, data){
         if (err){

@@ -25,6 +25,7 @@ const wsConnection = (server) => {
         } else {
         obj = JSON.parse(data); //now it an object
         nuevo={"message":message, "author": ws.id, "ts": Date.now() }
+       
         obj.push(nuevo);
         var json = JSON.stringify(obj);
         fs.writeFile('./api/messages.json', json, (err) => {
